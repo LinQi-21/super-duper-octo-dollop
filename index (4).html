@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>镌新智创 寻画杨柳 - 非遗文化数字传承平台</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP 动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* 自定义样式 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary-red: #c41e3a;
+            --primary-gold: #d4af37;
+            --primary-green: #2b5d3c;
+            --secondary-red: #e63946;
+            --secondary-gold: #f4d03f;
+            --secondary-green: #2e8b57;
+            --bg-light: #f8f9fa;
+            --bg-dark: #1a1a1a;
+            --text-light: #f8f9fa;
+            --text-dark: #333333;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-bg {
+            background-image: url('https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/19bb4170e06c42eea2d3b75ae82a938a~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158574&x-signature=zUvSvzS%2BGVpeGXEHCaZKUzew8pk%3D');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-red);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--primary-gold);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-gold);
+            transform: translateY(-2px);
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-gold);
+        }
+        
+        .process-step {
+            position: relative;
+        }
+        
+        .process-step::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -50%;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-gold);
+            z-index: -1;
+        }
+        
+        .process-step:first-child::before {
+            display: none;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary-gold);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 5px;
+            width: 2px;
+            height: calc(100% + 20px);
+            background-color: var(--primary-gold);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .gallery-item img {
+            transition: transform 0.5s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+        
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
+        }
+        
+        .pattern-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .pattern-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pattern-item.selected {
+            border: 3px solid var(--primary-red);
+        }
+        
+        /* 3D效果容器 */
+        #hero-3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        /* 加载动画 */
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-gold);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .process-step::before {
+                display: none;
+            }
+            
+            .timeline-item {
+                padding-left: 20px;
+            }
+        }
+        
+        /* 深色模式 */
+        .dark-mode {
+            --bg-light: #1a1a1a;
+            --bg-dark: #f8f9fa;
+            --text-light: #333333;
+            --text-dark: #f8f9fa;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gold);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gold);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://p11-doubao-search-sign.byteimg.com/labis/e6592f3729ff0c2abd931ed37cb6ea67~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=OiXVsmmhxMmlT%2FW%2BEqIf9OuCqv8%3D" alt="杨柳青年画标志" class="h-12 w-12 mr-3">
+                    <span class="text-2xl font-bold text-gray-800">镌新智创 寻画杨柳</span>
+                </div>
+                
+                <!-- 桌面导航 -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="nav-link text-gray-800 hover:text-red-700 font-medium">首页</a>
+                    <a href="#about" class="nav-link text-gray-800 hover:text-red-700 font-medium">文化介绍</a>
+                    <a href="#process" class="nav-link text-gray-800 hover:text-red-700 font-medium">制作工艺</a>
+                    <a href="#gallery" class="nav-link text-gray-800 hover:text-red-700 font-medium">数字记忆库</a>
+                    <a href="#ai-create" class="nav-link text-gray-800 hover:text-red-700 font-medium">AI创作体验</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-gray-800 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端导航菜单 -->
+            <div id="mobile-menu" class="md:hidden hidden pt-4 pb-2">
+                <a href="#home" class="block py-2 text-gray-800 hover:text-red-700 font-medium">首页</a>
+                <a href="#about" class="block py-2 text-gray-800 hover:text-red-700 font-medium">文化介绍</a>
+                <a href="#process" class="block py-2 text-gray-800 hover:text-red-700 font-medium">制作工艺</a>
+                <a href="#gallery" class="block py-2 text-gray-800 hover:text-red-700 font-medium">数字记忆库</a>
+                <a href="#ai-create" class="block py-2 text-gray-800 hover:text-red-700 font-medium">AI创作体验</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首页英雄区 -->
+    <section id="home" class="hero-bg min-h-screen flex items-center pt-16 relative overflow-hidden">
+        <div id="hero-3d"></div>
+        <div class="container mx-auto px-4 py-20">
+            <div class="max-w-3xl bg-white bg-opacity-90 p-8 rounded-lg shadow-lg">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">镌新智创 寻画杨柳</h1>
+                <h2 class="text-2xl md:text-3xl font-semibold text-red-700 mb-6">非遗文化数字传承平台</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    探索中国传统木版年画的艺术魅力，体验AI定制年画的创新乐趣，
+                    让这份跨世纪的传统技艺，留下最鲜活的传承注脚。
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#about" class="btn-primary px-6 py-3 rounded-lg font-medium text-lg">
+                        了解更多
+                    </a>
+                    <a href="#ai-create" class="btn-secondary px-6 py-3 rounded-lg font-medium text-lg">
+                        AI创作体验
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 文化介绍 -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-center mb-16">杨柳青年画文化介绍</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 text-red-700">历史渊源</h3>
+                    <p class="text-gray-700 mb-6">
+                        杨柳青年画始于明代末年，清代中晚期达到鼎盛。它发源于千年古镇杨柳青，
+                        因京杭大运河的开通及天津漕运的兴起而繁荣发展，成为南北商品交易的重要集散地。
+                    </p>
+                    <p class="text-gray-700 mb-6">
+                        清代光绪以前是杨柳青年画的鼎盛时期，那时以杨柳青镇为中心有300多个作坊，
+                        3000人从事杨柳青年画，周边城市也有6000多人从事杨柳青年画。
+                    </p>
+                    <p class="text-gray-700">
+                        2006年5月20日，杨柳青木版年画被列入第一批国家级非物质文化遗产名录。
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="https://p3-doubao-search-sign.byteimg.com/pgc-image/cd68f268c90942ffa09b352a650122b0~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=u1Rx%2Fe1oV2ZeCUDqojoH6%2FBx8PY%3D" alt="杨柳青年画作品" class="rounded-lg shadow-md h-48 w-full object-cover">
+                    <img src="https://p3-doubao-search-sign.byteimg.com/pgc-image/e8e1771ae90f413791eef0c553eb0b9f~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=dIR%2BJ%2Ba6F%2FbH33NKp7itapL40BU%3D" alt="杨柳青年画作品" class="rounded-lg shadow-md h-48 w-full object-cover">
+                    <img src="https://p26-doubao-search-sign.byteimg.com/labis/092c33792378bac42e2de36027ad99a8~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=R1QpVZpK%2BPl5iqhl9D6UMbnGYb0%3D" alt="杨柳青年画作品" class="rounded-lg shadow-md h-48 w-full object-cover">
+                    <img src="https://p26-doubao-search-sign.byteimg.com/labis/ae301dc70367d0e8c7b7b8bef6f8ab06~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=3bjDDAUBBildPnKk6afAXU0bCDA%3D" alt="杨柳青年画作品" class="rounded-lg shadow-md h-48 w-full object-cover">
+                </div>
+            </div>
+            
+            <div class="mt-20">
+                <h3 class="text-2xl font-semibold mb-8 text-center text-red-700">发展历程</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <div class="text-5xl text-yellow-600 mb-4">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">明代末年</h4>
+                        <p class="text-gray-700">
+                            杨柳青年画起源于明代末年，最初受苏州桃花坞年画影响，
+                            后来逐渐形成自己独特的风格。
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <div class="text-5xl text-yellow-600 mb-4">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">清代中晚期</h4>
+                        <p class="text-gray-700">
+                            清代中晚期是杨柳青年画的鼎盛时期，被誉为"家家会点染，户户善丹青"，
+                            成为宫廷贡品，深受皇室贵族喜爱。
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <div class="text-5xl text-yellow-600 mb-4">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">现代传承</h4>
+                        <p class="text-gray-700">
+                            2006年被列入第一批国家级非物质文化遗产名录，
+                            当代传承人致力于保护和创新这一传统艺术形式。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-20">
+                <h3 class="text-2xl font-semibold mb-8 text-center text-red-700">艺术特点</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="text-xl font-semibold mb-4">半印半绘的独特工艺</h4>
+                        <p class="text-gray-700 mb-4">
+                            杨柳青年画采用木版套印和手工彩绘相结合的方法，
+                            既有版画的刀法韵味，又有绘画的笔触色调，构成与一般绘画和其他年画不同的艺术特色。
+                        </p>
+                        <p class="text-gray-700">
+                            制作时先在木板上刻好线条，翻印在纸上，再由画师将颜色补齐，
+                            这种"半印半绘"的技法是杨柳青年画区别于其他年画的独特之处。
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="text-xl font-semibold mb-4">丰富多样的题材内容</h4>
+                        <p class="text-gray-700 mb-4">
+                            杨柳青年画的题材范围包括风俗、历史故事、戏曲人物、娃娃、美人、花卉、山水及神码等，
+                            以反映现实生活，时事风俗、历史故事等为特长。
+                        </p>
+                        <p class="text-gray-700">
+                            其中尤以娃娃画最具代表力，如《莲年有余》便是天津杨柳青年画的典型。
+                            杨柳青的娃娃画的特点：短胳膊短腿大脑壳、小鼻子大眼没有脖、鼻子眉眼一块凑、千万别把骨头露。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 制作工艺 -->
+    <section id="process" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-center mb-16">杨柳青年画制作工艺</h2>
+            
+            <div class="mb-12 text-center">
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto">
+                    杨柳青年画的制作过程分为勾、刻、印、绘、裱五大工序，
+                    即勾描、刻版、套印、彩绘、装裱，环环相扣，缺一不可。
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-16">
+                <div class="process-step bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                        1
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">勾描</h3>
+                    <p class="text-gray-700">
+                        由经验丰富的画师构思布局，用墨线勾勒出精细的画稿，
+                        线条要求和国画白描的线条一样，讲究有粗有细、抑扬顿挫。
+                    </p>
+                    <img src="https://p11-doubao-search-sign.byteimg.com/labis/38991e90d349e60817038fbf34b50b81~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118545&x-signature=Hm0%2Bjc1lR%2Fu%2Fd57x1a9swkuYO5E%3D" alt="勾描工序" class="mt-4 rounded-lg w-full h-40 object-cover">
+                </div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                        2
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">刻版</h3>
+                    <p class="text-gray-700">
+                        将勾好的画稿贴在刨平的梨木板上，空白处搓掉，以刀代笔，
+                        将勾好的线条刻出来，雕刻线条的时候要先刻大面积的粗线条，再刻小面积的细线条。
+                    </p>
+                    <img src="https://p26-doubao-search-sign.byteimg.com/mosaic-legacy/2a3600038a9dca0961ca~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118545&x-signature=74nJYvUIwo9Wwl6Eqqcmo8xX1Ks%3D" alt="刻版工序" class="mt-4 rounded-lg w-full h-40 object-cover">
+                </div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                        3
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">套印</h3>
+                    <p class="text-gray-700">
+                        用棕刷将颜料均匀地刷在画版上，再将宣纸覆盖在上面，用耥子按压、摩擦纸背，
+                        按照由浅到深的原则逐色套印，一般套印三到五色。
+                    </p>
+                    <img src="https://p11-doubao-search-sign.byteimg.com/labis/2ecc8aaa2ee47d296b5f14883e3daba0~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118545&x-signature=rOUTCnnqZ5A0SVD4z2tODVr38Fk%3D" alt="套印工序" class="mt-4 rounded-lg w-full h-40 object-cover">
+                </div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                        4
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">彩绘</h3>
+                    <p class="text-gray-700">
+                        在印好的轮廓上由画师手工填色上彩，这不是简单的涂色，
+                        而是要求画师根据不同题材、人物和场景，灵活运用晕染、烘托、点簇等技法进行艺术再加工。
+                    </p>
+                    <img src="https://p11-doubao-search-sign.byteimg.com/labis/4efa31516b62e8090ac46dbdc03d96f2~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118545&x-signature=8KTHbk2VWlCTRAhBGWcsSSgrEJU%3D" alt="彩绘工序" class="mt-4 rounded-lg w-full h-40 object-cover">
+                </div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                        5
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">装裱</h3>
+                    <p class="text-gray-700">
+                        最后进行装裱工序，将完成的作品托裱加固，使其平整美观、易于张贴保存，
+                        这是杨柳青年画制作的最后一步。
+                    </p>
+                    <img src="https://p26-doubao-search-sign.byteimg.com/ecom-shop-material/jpeg_m_c7337eaac34a79019e624478e893e36c_sx_700723_www1902-1902~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118545&x-signature=sM83iDZr3SuLrIZNuNA9LhG3Rrc%3D" alt="装裱工序" class="mt-4 rounded-lg w-full h-40 object-cover">
+                </div>
+            </div>
+            
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-semibold mb-6 text-center text-red-700">工艺特色</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">半印半绘的独特技法</h4>
+                        <p class="text-gray-700 mb-4">
+                            杨柳青年画在工艺上和其他地方年画最大的区别便是以绘为主。
+                            正如杨柳青年画"玉成号"第七代传人韩平所言，"杨柳青年画在全国都有名，
+                            它有名在哪？就是它在木版套印的基础上，比别其他年画多了一道手工上色。"
+                        </p>
+                        <p class="text-gray-700">
+                            这种"半印半绘"的技法堪称杨柳青年画的灵魂，它巧妙结合了雕版印刷能快速、
+                            精准复制轮廓的效率优势与手绘能呈现丰富色彩、精妙艺术表现力的长处。
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">精细的彩绘工艺</h4>
+                        <p class="text-gray-700 mb-4">
+                            杨柳青画社的非遗传承人用特制的笔将水和颜料调制到一定配比，
+                            一笔出三色，经过反复晕染，达到颜色既饱满又水润的状态。
+                        </p>
+                        <p class="text-gray-700">
+                            娃娃的脸生不生动，全靠画师画出来，一个人物的脸有20多道工序。
+                            这要求工匠必须具备高超的绘画技艺和深厚的美学素养。
+                            因此，一名合格的杨柳青年画画师，通常需要跟随师傅持续学习并刻苦实践三年甚至更长时间才能培养出来。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数字记忆库 -->
+    <section id="gallery" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-center mb-16">杨柳青年画数字记忆库</h2>
+            
+            <div class="mb-12">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                    <div class="relative w-full md:w-1/3">
+                        <input type="text" id="search-input" placeholder="搜索年画作品..." class="search-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none">
+                        <button id="search-btn" class="absolute right-3 top-3 text-gray-500 hover:text-red-700">
+                            <i class="fas fa-search text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-red-700 hover:text-white transition-all active" data-category="all">全部</button>
+                        <button class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-red-700 hover:text-white transition-all" data-category="娃娃">娃娃类</button>
+                        <button class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-red-700 hover:text-white transition-all" data-category="仕女">仕女类</button>
+                        <button class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-red-700 hover:text-white transition-all" data-category="民俗">民俗类</button>
+                        <button class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-red-700 hover:text-white transition-all" data-category="历史">历史故事类</button>
+                        <button class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-red-700 hover:text-white transition-all" data-category="神像">神像类</button>
+                    </div>
+                </div>
+                
+                <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- 年画作品将通过JavaScript动态加载 -->
+                </div>
+                
+                <div id="loading" class="hidden flex justify-center items-center py-8">
+                    <div class="loader"></div>
+                    <span class="ml-3 text-gray-700">加载中...</span>
+                </div>
+                
+                <div id="no-results" class="hidden text-center py-8">
+                    <p class="text-gray-700">未找到相关作品，请尝试其他关键词。</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button id="load-more" class="btn-primary px-6 py-3 rounded-lg font-medium">
+                    加载更多
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI创作体验 -->
+    <section id="ai-create" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-center mb-16">AI年画定制创作</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold mb-6 text-red-700">输入关键词创作</h3>
+                    <div class="mb-6">
+                        <label for="keyword-input" class="block text-gray-700 mb-2">请输入创作关键词</label>
+                        <div class="relative">
+                            <input type="text" id="keyword-input" placeholder="例如：春节、吉祥、娃娃、鲤鱼..." class="search-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none">
+                            <button id="generate-btn" class="absolute right-3 top-3 text-white bg-red-700 hover:bg-red-800 rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2 text-sm text-gray-500">
+                            <p>提示：尝试输入节日、吉祥寓意、人物或动物等关键词</p>
+                        </div>
+                    </div>
+                    
+                    <div id="suggestions" class="mb-6">
+                        <p class="text-gray-700 mb-2">推荐关键词：</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">春节</span>
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">吉祥</span>
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">娃娃</span>
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">鲤鱼</span>
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">牡丹</span>
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">福禄寿</span>
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">门神</span>
+                            <span class="suggestion-tag px-3 py-1 bg-gray-200 rounded-full text-sm cursor-pointer hover:bg-red-700 hover:text-white transition-all">仕女</span>
+                        </div>
+                    </div>
+                    
+                    <div id="pattern-recommendations" class="hidden">
+                        <h4 class="text-xl font-semibold mb-4">推荐传统纹样</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <!-- 推荐纹样将通过JavaScript动态加载 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold mb-6 text-red-700">创作预览</h3>
+                    <div id="preview-container" class="relative h-96 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-6">
+                        <div id="preview-placeholder" class="text-center">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/dd3c558e315e446a80ecb2afab83f934~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158591&x-signature=IR2eYqUCpYR08U1O7oneaNq2B9k%3D" alt="年画创作预览" class="w-full h-full object-contain opacity-50">
+                            <p class="text-gray-500 mt-4">输入关键词开始创作</p>
+                        </div>
+                        <div id="preview-image" class="hidden w-full h-full">
+                            <!-- 预览图片将通过JavaScript动态加载 -->
+                        </div>
+                        <div id="preview-loading" class="hidden absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center">
+                            <div class="loader"></div>
+                            <span class="ml-3 text-gray-700 mt-4">AI正在创作中...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <button id="save-btn" class="btn-primary px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i class="fas fa-download mr-2"></i>保存作品
+                        </button>
+                        <button id="share-btn" class="btn-secondary px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i class="fas fa-share-alt mr-2"></i>分享作品
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-20">
+                <h3 class="text-2xl font-semibold mb-8 text-center text-red-700">用户创作作品展示</h3>
+                <div id="user-creations" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- 用户创作作品将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">关于我们</h3>
+                    <p class="text-gray-400">
+                        杨柳青年画数字传承平台致力于通过数字化手段传播杨柳青年画文化，
+                        建立数字记忆库，并提供AI创作体验，增强用户参与感和对非遗文化的兴趣。
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">文化介绍</a></li>
+                        <li><a href="#process" class="text-gray-400 hover:text-white transition-colors">制作工艺</a></li>
+                        <li><a href="#gallery" class="text-gray-400 hover:text-white transition-colors">数字记忆库</a></li>
+                        <li><a href="#ai-create" class="text-gray-400 hover:text-white transition-colors">AI创作体验</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt w-5 mr-2"></i>
+                            <span class="text-gray-400">天津市和平区气象台路22号</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope w-5 mr-2"></i>
+                            <span class="text-gray-400">JXZCxhyll@163.cm</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">关注我们</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-2xl">
+                            <i class="fab fa-weixin"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-2xl">
+                            <i class="fab fa-weibo"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-2xl">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-2xl">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-400">订阅我们的新闻通讯</p>
+                        <div class="mt-2 flex">
+                            <input type="email" placeholder="您的邮箱地址" class="px-4 py-2 rounded-l-lg focus:outline-none text-gray-800 w-full">
+                            <button class="bg-red-700 hover:bg-red-800 px-4 py-2 rounded-r-lg transition-colors">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">© 2025 镌新智创 寻画杨柳. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-red-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all z-50">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- 深色模式切换按钮 -->
+    <button id="dark-mode-toggle" class="fixed bottom-8 left-8 bg-gray-800 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- 作品详情模态框 -->
+    <div id="artwork-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="modal-title" class="text-2xl font-semibold"></h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-800 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <img id="modal-image" src="" alt="年画作品" class="w-full h-auto rounded-lg">
+                    </div>
+                    <div>
+                        <p id="modal-description" class="text-gray-700 mb-4"></p>
+                        <div class="space-y-2">
+                            <p><strong>类别：</strong><span id="modal-category"></span></p>
+                            <p><strong>年代：</strong><span id="modal-year"></span></p>
+                            <p><strong>尺寸：</strong><span id="modal-size"></span></p>
+                            <p><strong>收藏地：</strong><span id="modal-location"></span></p>
+                        </div>
+                        <div class="mt-6 flex gap-4">
+                            <button class="btn-primary px-4 py-2 rounded-lg">
+                                <i class="fas fa-heart mr-2"></i>收藏
+                            </button>
+                            <button class="btn-secondary px-4 py-2 rounded-lg">
+                                <i class="fas fa-share-alt mr-2"></i>分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化3D效果
+            initHero3D();
+            
+            // 初始化动画
+            initAnimations();
+            
+            // 初始化导航菜单
+            initNavigation();
+            
+            // 初始化数字记忆库
+            initGallery();
+            
+            // 初始化AI创作体验
+            initAICreation();
+            
+            // 初始化用户创作作品展示
+            initUserCreations();
+            
+            // 初始化返回顶部按钮
+            initBackToTop();
+            
+            // 初始化深色模式切换
+            initDarkMode();
+            
+            // 初始化模态框
+            initModal();
+        });
+
+        // 初始化3D效果
+        function initHero3D() {
+            // 创建场景
+            const scene = new THREE.Scene();
+            
+            // 创建相机
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // 创建渲染器
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            
+            // 添加到DOM
+            const container = document.getElementById('hero-3d');
+            container.appendChild(renderer.domElement);
+            
+            // 创建粒子
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            // 创建材质
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                color: 0xd4af37,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            // 创建粒子系统
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            // 动画循环
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.y += 0.001;
+                particlesMesh.rotation.x += 0.0005;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // 初始化动画
+        function initAnimations() {
+            // 注册ScrollTrigger插件
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // 首页英雄区动画
+            gsap.from('.hero-bg .container > div', {
+                duration: 1,
+                y: 50,
+                opacity: 0,
+                delay: 0.5,
+                ease: 'power3.out'
+            });
+            
+            // 文化介绍部分动画
+            gsap.from('#about .section-title', {
+                scrollTrigger: {
+                    trigger: '#about',
+                    start: 'top 80%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                ease: 'power3.out'
+            });
+            
+            gsap.from('#about .grid > div', {
+                scrollTrigger: {
+                    trigger: '#about',
+                    start: 'top 70%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                stagger: 0.2,
+                ease: 'power3.out'
+            });
+            
+            // 制作工艺部分动画
+            gsap.from('#process .section-title', {
+                scrollTrigger: {
+                    trigger: '#process',
+                    start: 'top 80%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                ease: 'power3.out'
+            });
+            
+            gsap.from('#process .process-step', {
+                scrollTrigger: {
+                    trigger: '#process',
+                    start: 'top 70%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                stagger: 0.2,
+                ease: 'power3.out'
+            });
+            
+            // 数字记忆库部分动画
+            gsap.from('#gallery .section-title', {
+                scrollTrigger: {
+                    trigger: '#gallery',
+                    start: 'top 80%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                ease: 'power3.out'
+            });
+            
+            gsap.from('#gallery .flex-wrap', {
+                scrollTrigger: {
+                    trigger: '#gallery',
+                    start: 'top 70%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                ease: 'power3.out'
+            });
+            
+            // AI创作体验部分动画
+            gsap.from('#ai-create .section-title', {
+                scrollTrigger: {
+                    trigger: '#ai-create',
+                    start: 'top 80%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                ease: 'power3.out'
+            });
+            
+            gsap.from('#ai-create .bg-white', {
+                scrollTrigger: {
+                    trigger: '#ai-create',
+                    start: 'top 70%'
+                },
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                stagger: 0.2,
+                ease: 'power3.out'
+            });
+        }
+
+        // 初始化导航菜单
+        function initNavigation() {
+            // 移动端菜单切换
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // 如果是移动端，点击后关闭菜单
+                        if (window.innerWidth < 768) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+        }
+
+        // 初始化数字记忆库
+        function initGallery() {
+            // 模拟年画数据
+            const artworks = [
+                {
+                    id: 1,
+                    title: '连年有余',
+                    description: '杨柳青年画的代表作品之一，描绘了一个可爱的娃娃抱着一条大鲤鱼，象征着年年有余、吉祥如意。',
+                    image: 'https://p26-doubao-search-sign.byteimg.com/labis/092c33792378bac42e2de36027ad99a8~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=R1QpVZpK%2BPl5iqhl9D6UMbnGYb0%3D',
+                    category: '娃娃',
+                    year: '清代',
+                    size: '34×45cm',
+                    location: '天津杨柳青画社'
+                },
+                {
+                    id: 2,
+                    title: '五子夺莲',
+                    description: '描绘了五个可爱的娃娃争夺莲花的场景，象征着多子多福、吉祥如意。',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/pgc-image/cd68f268c90942ffa09b352a650122b0~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=u1Rx%2Fe1oV2ZeCUDqojoH6%2FBx8PY%3D',
+                    category: '娃娃',
+                    year: '清代',
+                    size: '34×45cm',
+                    location: '天津杨柳青画社'
+                },
+                {
+                    id: 3,
+                    title: '仕女游春',
+                    description: '描绘了一位美丽的仕女在春天出游的场景，画面优美，色彩艳丽。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/45ff21c425f679b6226e3d8897f884f1~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=bBW%2BsMRwW3euDr%2BZ2uE0YXg%2B96I%3D',
+                    category: '仕女',
+                    year: '清代',
+                    size: '40×50cm',
+                    location: '天津博物馆'
+                },
+                {
+                    id: 4,
+                    title: '琴棋书画',
+                    description: '描绘了四位仕女分别在弹琴、下棋、书法和绘画的场景，体现了古代女子的才情和修养。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/TeBNLqdZ_m_1b77bd66022058fa6e2ce709f8e73962_sx_98541_www800-800~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=eRiX8Tl%2B5JrQDHRLUnrOfq%2BELrs%3D',
+                    category: '仕女',
+                    year: '清代',
+                    size: '40×50cm',
+                    location: '天津博物馆'
+                },
+                {
+                    id: 5,
+                    title: '庆赏元宵',
+                    description: '描绘了人们在元宵节赏灯、游玩的热闹场景，反映了清代民间的节日习俗。',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/pgc-image/e8e1771ae90f413791eef0c553eb0b9f~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=dIR%2BJ%2Ba6F%2FbH33NKp7itapL40BU%3D',
+                    category: '民俗',
+                    year: '清代',
+                    size: '50×60cm',
+                    location: '中国国家博物馆'
+                },
+                {
+                    id: 6,
+                    title: '庄稼忙',
+                    description: '描绘了农民在田间劳作的场景，反映了清代农村的生产生活。',
+                    image: 'https://p26-doubao-search-sign.byteimg.com/labis/ae301dc70367d0e8c7b7b8bef6f8ab06~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=3bjDDAUBBildPnKk6afAXU0bCDA%3D',
+                    category: '民俗',
+                    year: '清代',
+                    size: '50×60cm',
+                    location: '中国农业博物馆'
+                },
+                {
+                    id: 7,
+                    title: '水浒传',
+                    description: '描绘了《水浒传》中的英雄人物，画面生动，人物形象鲜明。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/21e03dba83835f6699ada5c6424fbd78~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=6%2BGWk15N9wp70ys5X41ensdqTrQ%3D',
+                    category: '历史',
+                    year: '清代',
+                    size: '45×55cm',
+                    location: '天津杨柳青画社'
+                },
+                {
+                    id: 8,
+                    title: '红楼梦',
+                    description: '描绘了《红楼梦》中的场景和人物，画面细腻，色彩艳丽。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/jpeg_m_d4175ae5417a3de77845b0ff97a6b783_sx_77082_www800-800~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=lMpuVTQhLY%2FF7RxPImktBmHSNLo%3D',
+                    category: '历史',
+                    year: '清代',
+                    size: '45×55cm',
+                    location: '北京故宫博物院'
+                },
+                {
+                    id: 9,
+                    title: '门神',
+                    description: '描绘了秦琼和尉迟恭两位门神，用于贴在门上驱邪避灾，保佑平安。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/sIgaNOkX_m_01496dd487b06f58846c2748c6781f8f_sx_943161_www720-1280~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=%2B%2BxnU8UQSPra%2Fqo8WaaKJgDcVxc%3D',
+                    category: '神像',
+                    year: '清代',
+                    size: '60×80cm',
+                    location: '天津杨柳青画社'
+                },
+                {
+                    id: 10,
+                    title: '财神',
+                    description: '描绘了财神赵公明，象征着财富和吉祥，是民间最受欢迎的神像之一。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/e6592f3729ff0c2abd931ed37cb6ea67~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=OiXVsmmhxMmlT%2FW%2BEqIf9OuCqv8%3D',
+                    category: '神像',
+                    year: '清代',
+                    size: '60×80cm',
+                    location: '天津杨柳青画社'
+                },
+                {
+                    id: 11,
+                    title: '三阳开泰',
+                    description: '描绘了三只羊的形象，象征着吉祥如意、国泰民安。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/TeBNLqdZ_m_9ebfad6d9fc60ce143097c210b963064_sx_70736_www800-800~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=szahXDO9wSin%2BO7QO9mmlHTVj2s%3D',
+                    category: '吉祥',
+                    year: '清代',
+                    size: '40×50cm',
+                    location: '天津杨柳青画社'
+                },
+                {
+                    id: 12,
+                    title: '万事如意',
+                    description: '描绘了一位可爱的娃娃手持如意，象征着万事如意、吉祥幸福。',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/21e03dba83835f6699ada5c6424fbd78~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=6%2BGWk15N9wp70ys5X41ensdqTrQ%3D',
+                    category: '娃娃',
+                    year: '清代',
+                    size: '34×45cm',
+                    location: '天津杨柳青画社'
+                }
+            ];
+            
+            // 渲染年画作品
+            const galleryContainer = document.getElementById('gallery-container');
+            const loading = document.getElementById('loading');
+            const noResults = document.getElementById('no-results');
+            const loadMoreBtn = document.getElementById('load-more');
+            
+            let currentPage = 1;
+            const itemsPerPage = 8;
+            let filteredArtworks = [...artworks];
+            
+            // 渲染作品
+            function renderArtworks(artworksToRender, replace = true) {
+                if (replace) {
+                    galleryContainer.innerHTML = '';
+                }
+                
+                if (artworksToRender.length === 0) {
+                    noResults.classList.remove('hidden');
+                    loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+                
+                noResults.classList.add('hidden');
+                
+                artworksToRender.forEach(artwork => {
+                    const artworkElement = document.createElement('div');
+                    artworkElement.className = 'gallery-item rounded-lg overflow-hidden shadow-md';
+                    artworkElement.dataset.id = artwork.id;
+                    artworkElement.dataset.category = artwork.category;
+                    
+                    artworkElement.innerHTML = `
+                        <img src="${artwork.image}" alt="${artwork.title}" class="w-full h-64 object-cover">
+                        <div class="gallery-overlay">
+                            <h3 class="text-lg font-semibold">${artwork.title}</h3>
+                            <p class="text-sm">${artwork.category}类 · ${artwork.year}</p>
+                        </div>
+                    `;
+                    
+                    galleryContainer.appendChild(artworkElement);
+                    
+                    // 添加点击事件
+                    artworkElement.addEventListener('click', () => {
+                        openModal(artwork);
+                    });
+                });
+                
+                // 更新加载更多按钮状态
+                if (currentPage * itemsPerPage >= filteredArtworks.length) {
+                    loadMoreBtn.classList.add('hidden');
+                } else {
+                    loadMoreBtn.classList.remove('hidden');
+                }
+            }
+            
+            // 初始加载
+            renderArtworks(filteredArtworks.slice(0, itemsPerPage));
+            
+            // 加载更多按钮点击事件
+            loadMoreBtn.addEventListener('click', () => {
+                loading.classList.remove('hidden');
+                loadMoreBtn.classList.add('hidden');
+                
+                // 模拟加载延迟
+                setTimeout(() => {
+                    currentPage++;
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const nextPageItems = filteredArtworks.slice(startIndex, endIndex);
+                    
+                    renderArtworks(nextPageItems, false);
+                    
+                    loading.classList.add('hidden');
+                }, 1000);
+            });
+            
+            // 搜索功能
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    filteredArtworks = [...artworks];
+                } else {
+                    filteredArtworks = artworks.filter(artwork => 
+                        artwork.title.toLowerCase().includes(searchTerm) ||
+                        artwork.description.toLowerCase().includes(searchTerm) ||
+                        artwork.category.toLowerCase().includes(searchTerm) ||
+                        artwork.year.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                currentPage = 1;
+                renderArtworks(filteredArtworks.slice(0, itemsPerPage));
+            }
+            
+            searchBtn.addEventListener('click', performSearch);
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // 分类筛选
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 移除所有按钮的active类
+                    categoryBtns.forEach(b => b.classList.remove('active', 'bg-red-700', 'text-white'));
+                    
+                    // 添加当前按钮的active类
+                    btn.classList.add('active', 'bg-red-700', 'text-white');
+                    
+                    const category = btn.dataset.category;
+                    
+                    if (category === 'all') {
+                        filteredArtworks = [...artworks];
+                    } else {
+                        filteredArtworks = artworks.filter(artwork => artwork.category === category);
+                    }
+                    
+                    currentPage = 1;
+                    renderArtworks(filteredArtworks.slice(0, itemsPerPage));
+                });
+            });
+        }
+
+        // 初始化AI创作体验
+        function initAICreation() {
+            const keywordInput = document.getElementById('keyword-input');
+            const generateBtn = document.getElementById('generate-btn');
+            const suggestionTags = document.querySelectorAll('.suggestion-tag');
+            const patternRecommendations = document.getElementById('pattern-recommendations');
+            const previewPlaceholder = document.getElementById('preview-placeholder');
+            const previewImage = document.getElementById('preview-image');
+            const previewLoading = document.getElementById('preview-loading');
+            const saveBtn = document.getElementById('save-btn');
+            const shareBtn = document.getElementById('share-btn');
+            
+            // 内置高质量年画图片库
+            const highQualityArtworks = [
+                {
+                    id: 1,
+                    title: '连年有余',
+                    image: 'https://p26-doubao-search-sign.byteimg.com/labis/092c33792378bac42e2de36027ad99a8~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=R1QpVZpK%2BPl5iqhl9D6UMbnGYb0%3D',
+                    keywords: ['连年有余', '娃娃', '鲤鱼', '莲花', '吉祥', '喜庆', '红色']
+                },
+                {
+                    id: 2,
+                    title: '五子夺莲',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/pgc-image/cd68f268c90942ffa09b352a650122b0~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=u1Rx%2Fe1oV2ZeCUDqojoH6%2FBx8PY%3D',
+                    keywords: ['五子夺莲', '娃娃', '莲花', '多子多福', '吉祥', '喜庆']
+                },
+                {
+                    id: 3,
+                    title: '仕女游春',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/45ff21c425f679b6226e3d8897f884f1~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=bBW%2BsMRwW3euDr%2BZ2uE0YXg%2B96I%3D',
+                    keywords: ['仕女游春', '仕女', '春天', '出游', '美女', '花卉']
+                },
+                {
+                    id: 4,
+                    title: '琴棋书画',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/TeBNLqdZ_m_1b77bd66022058fa6e2ce709f8e73962_sx_98541_www800-800~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=eRiX8Tl%2B5JrQDHRLUnrOfq%2BELrs%3D',
+                    keywords: ['琴棋书画', '仕女', '才女', '乐器', '下棋', '书法', '绘画']
+                },
+                {
+                    id: 5,
+                    title: '庆赏元宵',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/pgc-image/e8e1771ae90f413791eef0c553eb0b9f~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=dIR%2BJ%2Ba6F%2FbH33NKp7itapL40BU%3D',
+                    keywords: ['庆赏元宵', '元宵节', '灯笼', '民俗', '节日', '喜庆']
+                },
+                {
+                    id: 6,
+                    title: '庄稼忙',
+                    image: 'https://p26-doubao-search-sign.byteimg.com/labis/ae301dc70367d0e8c7b7b8bef6f8ab06~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=3bjDDAUBBildPnKk6afAXU0bCDA%3D',
+                    keywords: ['庄稼忙', '农耕', '农民', '田园', '劳动', '民俗']
+                },
+                {
+                    id: 7,
+                    title: '水浒传',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/21e03dba83835f6699ada5c6424fbd78~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=6%2BGWk15N9wp70ys5X41ensdqTrQ%3D',
+                    keywords: ['水浒传', '英雄', '历史故事', '小说', '人物']
+                },
+                {
+                    id: 8,
+                    title: '红楼梦',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/jpeg_m_d4175ae5417a3de77845b0ff97a6b783_sx_77082_www800-800~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=lMpuVTQhLY%2FF7RxPImktBmHSNLo%3D',
+                    keywords: ['红楼梦', '爱情', '历史故事', '小说', '人物', '仕女']
+                },
+                {
+                    id: 9,
+                    title: '门神',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/sIgaNOkX_m_01496dd487b06f58846c2748c6781f8f_sx_943161_www720-1280~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=%2B%2BxnU8UQSPra%2Fqo8WaaKJgDcVxc%3D',
+                    keywords: ['门神', '秦琼', '尉迟恭', '神像', '辟邪', '平安']
+                },
+                {
+                    id: 10,
+                    title: '财神',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/e6592f3729ff0c2abd931ed37cb6ea67~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=OiXVsmmhxMmlT%2FW%2BEqIf9OuCqv8%3D',
+                    keywords: ['财神', '赵公明', '财富', '吉祥', '神像', '福禄寿']
+                },
+                {
+                    id: 11,
+                    title: '三阳开泰',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/TeBNLqdZ_m_9ebfad6d9fc60ce143097c210b963064_sx_70736_www800-800~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=szahXDO9wSin%2BO7QO9mmlHTVj2s%3D',
+                    keywords: ['三阳开泰', '羊', '吉祥', '国泰民安', '喜庆']
+                },
+                {
+                    id: 12,
+                    title: '万事如意',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/labis/21e03dba83835f6699ada5c6424fbd78~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=6%2BGWk15N9wp70ys5X41ensdqTrQ%3D',
+                    keywords: ['万事如意', '娃娃', '如意', '吉祥', '幸福']
+                },
+                {
+                    id: 13,
+                    title: '四季平安',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/pgc-image/cd68f268c90942ffa09b352a650122b0~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=u1Rx%2Fe1oV2ZeCUDqojoH6%2FBx8PY%3D',
+                    keywords: ['四季平安', '四季', '平安', '吉祥', '花卉', '娃娃']
+                },
+                {
+                    id: 14,
+                    title: '金玉满堂',
+                    image: 'https://p26-doubao-search-sign.byteimg.com/labis/ae301dc70367d0e8c7b7b8bef6f8ab06~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118524&x-signature=3bjDDAUBBildPnKk6afAXU0bCDA%3D',
+                    keywords: ['金玉满堂', '财富', '吉祥', '娃娃', '喜庆']
+                },
+                {
+                    id: 15,
+                    title: '龙凤呈祥',
+                    image: 'https://p11-doubao-search-sign.byteimg.com/ecom-shop-material/TeBNLqdZ_m_9ebfad6d9fc60ce143097c210b963064_sx_70736_www800-800~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1782118523&x-signature=szahXDO9wSin%2BO7QO9mmlHTVj2s%3D',
+                    keywords: ['龙凤呈祥', '龙', '凤', '吉祥', '婚姻', '喜庆']
+                }
+            ];
+            
+            // 关键词匹配函数
+            function matchKeyword(keyword) {
+                const lowerKeyword = keyword.toLowerCase().trim();
+                if (!lowerKeyword) return null;
+                
+                // 存储匹配度分数
+                const matchScores = highQualityArtworks.map(artwork => {
+                    let score = 0;
+                    
+                    // 检查标题是否完全匹配
+                    if (artwork.title.toLowerCase() === lowerKeyword) {
+                        score += 10;
+                    }
+                    
+                    // 检查关键词是否完全匹配
+                    if (artwork.keywords.some(k => k.toLowerCase() === lowerKeyword)) {
+                        score += 8;
+                    }
+                    
+                    // 检查标题是否包含关键词
+                    if (artwork.title.toLowerCase().includes(lowerKeyword)) {
+                        score += 5;
+                    }
+                    
+                    // 检查关键词是否包含关键词
+                    artwork.keywords.forEach(k => {
+                        if (k.toLowerCase().includes(lowerKeyword)) {
+                            score += 3;
+                        }
+                    });
+                    
+                    return { artwork, score };
+                });
+                
+                // 按匹配度排序
+                matchScores.sort((a, b) => b.score - a.score);
+                
+                // 返回匹配度最高的作品（如果有匹配的）
+                return matchScores[0].score > 0 ? matchScores[0].artwork : null;
+            }
+            
+            // 推荐关键词点击事件
+            suggestionTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    keywordInput.value = tag.textContent;
+                });
+            });
+            
+            // 生成按钮点击事件
+            generateBtn.addEventListener('click', () => {
+                const keyword = keywordInput.value.trim();
+                
+                if (keyword === '') {
+                    alert('请输入关键词');
+                    return;
+                }
+                
+                // 显示加载状态
+                previewPlaceholder.classList.add('hidden');
+                previewImage.classList.add('hidden');
+                previewLoading.classList.remove('hidden');
+                saveBtn.disabled = true;
+                shareBtn.disabled = true;
+                
+                // 模拟搜索过程
+                setTimeout(() => {
+                    // 根据关键词匹配图片
+                    const matchedArtwork = matchKeyword(keyword);
+                    
+                    // 隐藏加载状态
+                    previewLoading.classList.add('hidden');
+                    
+                    if (matchedArtwork) {
+                        // 显示匹配结果
+                        previewImage.classList.remove('hidden');
+                        previewImage.innerHTML = `
+                            <div class="relative w-full h-full">
+                                <img src="${matchedArtwork.image}" alt="${matchedArtwork.title}" class="w-full h-full object-contain">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-3">
+                                    <h3 class="text-xl font-semibold">${matchedArtwork.title}</h3>
+                                    <p class="text-sm">根据关键词"${keyword}"匹配的杨柳青年画作品</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // 启用保存和分享按钮
+                        saveBtn.disabled = false;
+                        shareBtn.disabled = false;
+                        
+                        // 显示推荐纹样
+                        patternRecommendations.classList.remove('hidden');
+                        loadPatternRecommendations(keyword);
+                    } else {
+                        // 没有匹配结果
+                        previewPlaceholder.classList.remove('hidden');
+                        previewPlaceholder.innerHTML = `
+                            <div class="text-center">
+                                <i class="fas fa-search text-5xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-500">未找到与"${keyword}"相关的年画作品</p>
+                                <p class="text-gray-400 text-sm mt-2">请尝试其他关键词，如"娃娃"、"鲤鱼"、"门神"等</p>
+                            </div>
+                        `;
+                    }
+                }, 1500);
+            });
+            
+            // 保存按钮点击事件
+            saveBtn.addEventListener('click', () => {
+                alert('作品已保存到您的账户');
+            });
+            
+            // 分享按钮点击事件
+            shareBtn.addEventListener('click', () => {
+                alert('分享链接已复制到剪贴板');
+            });
+        }
+
+        // 加载推荐纹样
+        function loadPatternRecommendations(keyword) {
+            const recommendationsContainer = document.querySelector('#pattern-recommendations .grid');
+            recommendationsContainer.innerHTML = '';
+            
+            // 模拟推荐纹样数据
+            const patterns = [
+                { id: 1, image: 'https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/8462c698241d44cf82b5fa56d4826b38~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158581&x-signature=aucJ9SECUbFQArNV5ixCGVWKjUU%3D', name: '传统花纹' },
+                { id: 2, image: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/dd3c558e315e446a80ecb2afab83f934~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158591&x-signature=IR2eYqUCpYR08U1O7oneaNq2B9k%3D', name: '吉祥图案' },
+                { id: 3, image: 'https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/19bb4170e06c42eea2d3b75ae82a938a~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158574&x-signature=zUvSvzS%2BGVpeGXEHCaZKUzew8pk%3D', name: '娃娃形象' }
+            ];
+            
+            patterns.forEach(pattern => {
+                const patternElement = document.createElement('div');
+                patternElement.className = 'pattern-item rounded-lg overflow-hidden shadow-md';
+                
+                patternElement.innerHTML = `
+                    <img src="${pattern.image}" alt="${pattern.name}" class="w-full h-32 object-cover">
+                    <div class="p-2 text-center">
+                        <p class="text-sm font-medium">${pattern.name}</p>
+                    </div>
+                `;
+                
+                recommendationsContainer.appendChild(patternElement);
+                
+                // 添加点击事件
+                patternElement.addEventListener('click', () => {
+                    // 移除其他选中状态
+                    document.querySelectorAll('.pattern-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    // 添加选中状态
+                    patternElement.classList.add('selected');
+                });
+            });
+        }
+
+        // 初始化用户创作作品展示
+        function initUserCreations() {
+            const userCreationsContainer = document.getElementById('user-creations');
+            
+            // 模拟用户创作作品数据
+            const userCreations = [
+                { id: 1, title: '吉祥如意', image: 'https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/19bb4170e06c42eea2d3b75ae82a938a~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158574&x-signature=zUvSvzS%2BGVpeGXEHCaZKUzew8pk%3D', user: '用户123' },
+                { id: 2, title: '连年有余', image: 'https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/8462c698241d44cf82b5fa56d4826b38~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158581&x-signature=aucJ9SECUbFQArNV5ixCGVWKjUU%3D', user: '用户456' },
+                { id: 3, title: '春节快乐', image: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/dd3c558e315e446a80ecb2afab83f934~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158591&x-signature=IR2eYqUCpYR08U1O7oneaNq2B9k%3D', user: '用户789' },
+                { id: 4, title: '福禄寿喜', image: 'https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/19bb4170e06c42eea2d3b75ae82a938a~tplv-a9rns2rl98-image.image?rcl=20251224165448EAF98ACEC8FD00D7F80E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769158574&x-signature=zUvSvzS%2BGVpeGXEHCaZKUzew8pk%3D', user: '用户101' }
+            ];
+            
+            userCreations.forEach(creation => {
+                const creationElement = document.createElement('div');
+                creationElement.className = 'bg-white rounded-lg overflow-hidden shadow-md';
+                
+                creationElement.innerHTML = `
+                    <img src="${creation.image}" alt="${creation.title}" class="w-full h-64 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold mb-2">${creation.title}</h3>
+                        <p class="text-sm text-gray-600">创作者: ${creation.user}</p>
+                    </div>
+                `;
+                
+                userCreationsContainer.appendChild(creationElement);
+            });
+        }
+
+        // 初始化返回顶部按钮
+        function initBackToTop() {
+            const backToTopBtn = document.getElementById('back-to-top');
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.classList.remove('opacity-0', 'invisible');
+                    backToTopBtn.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopBtn.classList.remove('opacity-100', 'visible');
+                    backToTopBtn.classList.add('opacity-0', 'invisible');
+                }
+            });
+            
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // 初始化深色模式切换
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const body = document.body;
+            
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                
+                const icon = darkModeToggle.querySelector('i');
+                
+                if (body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+        }
+
+        // 初始化模态框
+        function initModal() {
+            const modal = document.getElementById('artwork-modal');
+            const closeModal = document.getElementById('close-modal');
+            
+            closeModal.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+
+        // 打开模态框
+        function openModal(artwork) {
+            const modal = document.getElementById('artwork-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalImage = document.getElementById('modal-image');
+            const modalDescription = document.getElementById('modal-description');
+            const modalCategory = document.getElementById('modal-category');
+            const modalYear = document.getElementById('modal-year');
+            const modalSize = document.getElementById('modal-size');
+            const modalLocation = document.getElementById('modal-location');
+            
+            modalTitle.textContent = artwork.title;
+            modalImage.src = artwork.image;
+            modalImage.alt = artwork.title;
+            modalDescription.textContent = artwork.description;
+            modalCategory.textContent = artwork.category;
+            modalYear.textContent = artwork.year;
+            modalSize.textContent = artwork.size;
+            modalLocation.textContent = artwork.location;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    </script>
+</body>
+</html>
